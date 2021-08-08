@@ -32,6 +32,7 @@
 *.app
 
 # Plataform-specific files and directories #
+*.vs
 .idea/
 .vscode/
 bin/
