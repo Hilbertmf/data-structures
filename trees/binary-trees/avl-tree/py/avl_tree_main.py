@@ -1,9 +1,11 @@
+import avl_tree
+
 def main():
   option = -1
-  tree = BST()
+  tree = AVLTree()
 
   while option != 0:
-    print("Which operation you wanna do?")
+    print("Which operation you wanna perform?")
     print("1. Insert node")
     print("2. Search node")
     print("3. Delete node")
@@ -14,13 +16,14 @@ def main():
     print("0. Exit")
     option = int(input("Select Option number: "))
 
+    node = TreeNode();
     if option == 0:
       print("\nExiting...\n", end='')
     elif option == 1:
       val = int(input("Pass an integer value to insert: "))
-      print("\nInserting...\n", end='')
-      tree.insert(val)
-      # insert node
+      print("\nInserting {}...".format(val))
+      node.value = val
+      tree.root = tree.insert(tree.root, node)
     elif option == 2:
       val = int(input("Pass an integer value to search: "))
       print("\nSearching...\n", end='')
@@ -30,13 +33,11 @@ def main():
         print("{} is not present in the tree.\n\n".format(val), end='')
     elif option == 3:
       val = int(input("Pass a node to delete:"))
-      if tree.contains(val):
+      if tree.contains(val, tree.root):
         print("\nDeleting...\n")
-        tree.deleteNode(tree.root, val)
+        tree.root = tree.deleteNode(tree.root, val)
       else:
         print("\nValue not found\n")
-      
-      
       # delete node
     elif option == 4:
       print("\n", end='')

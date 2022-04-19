@@ -20,11 +20,11 @@ class TreeNode {
     }
 };
 
-class BST {
+class AVLTree {
   public:
     TreeNode *root;
 
-    BST() {
+    AVLTree() {
       root = nullptr;
     }
     
@@ -103,7 +103,42 @@ class BST {
       printPostOrder(root->right);
       std::cout << root->value << " ";
     }
+// -----------------------------------------------------
 
+    int height(TreeNode *node) {
+      if(node == nullptr) return -1;
+
+      int leftHeight = height(node->left);
+      int rightHeight = height(node->right);
+      if(leftHeight > rightHeight)
+        return leftHeight + 1;
+      else
+        return rightHeight + 1;
+    }
+    
+    int getBalanceFactor(TreeNode *node) {
+      if(node == nullptr) return -1;
+      return height(node->left) - height(node->right);
+    }
+
+    TreeNode* rightRotate(TreeNode *x) {
+      TreeNode *y = x->left;
+      TreeNode *subtree = y->right;
+      // perform rotation
+      y->right = x;
+      x->left = subtree;
+      return y;
+    }
+    
+    TreeNode* leftRotate(TreeNode *x) {
+      TreeNode *y = x->right;
+      TreeNode *subtree = y->left;
+      // perform rotation
+      y->left = x;
+      x->right = subtree;
+      return y;
+    }
+    
     void insert(int val) {
       std::cout << "inserting " << val << "..." << std::endl;
       TreeNode* node = new TreeNode(val);
@@ -148,6 +183,7 @@ class BST {
     TreeNode* insertRecursive(TreeNode *curr, TreeNode *newNode) {
       if(curr == nullptr) {
         curr = newNode;
+        std::cout << curr->value << " inserted sucessfully" << std::endl;
         return curr;
       }
       if(newNode->value < curr->value) {
@@ -160,6 +196,22 @@ class BST {
         cout << "No duplicates allowed, insert another value" << endl;
         return curr;
       }
+      int bf = getBalanceFactor(curr);
+      if(bf > 1 && newNode->value < curr->left->value) { // left left
+        return rightRotate(curr);
+      }
+      else if(bf < -1 && newNode->value > curr->right->value) { // right right
+        return leftRotate(curr);
+      }
+      else if(bf > 1 && newNode->value > curr->left->value) { // left right
+        curr->left = leftRotate(curr->left);
+        return rightRotate(curr);
+      }
+      else if(bf < -1 && newNode->value < curr->right->value) { // right left
+        curr->right = rightRotate(curr->right);
+        return leftRotate(curr);
+      }
+      
       return curr;
     }
 
@@ -185,43 +237,80 @@ class BST {
       return curr;
     }
     
-    TreeNode* erase(TreeNode *root, int val) {
-      if(root == nullptr) return root;
+    TreeNode* erase(TreeNode *curr, int val) {
+      if(curr == nullptr) return curr;
 
-      else if(val < root->value) {
-        root->left = erase(root->left, val);
+      else if(val < curr->value) {
+        curr->left = erase(curr->left, val);
       }
-      else if(val > root->value) {
-        root->right = erase(root->right, val);
+      else if(val > curr->value) {
+        curr->right = erase(curr->right, val);
       }
-      else { // val == root->value
-        if(root->left == nullptr) { // only right child
-          TreeNode *tmp = root->right; // or no child
-          delete root;
+      else { // val == curr->value
+        if(curr->left == nullptr) { // only right child
+          TreeNode *tmp = curr->right; // or no child
+          delete curr;
           return tmp;
         }
-        else if(root->right == nullptr) { // left child
-          TreeNode *tmp = root->left;
-          delete root;
+        else if(curr->right == nullptr) { // left child
+          TreeNode *tmp = curr->left;
+          delete curr;
           return tmp;
         }
         else { // 2 children
           // replace w/ next sucessor or last pre
           TreeNode *tmp;
-          if(nextSucessor(root) != nullptr) {
-            tmp = nextSucessor(root);
-            root->value = tmp->value;
-            root->right = erase(root->right, tmp->value);
+          if(nextSucessor(curr) != nullptr) {
+            tmp = nextSucessor(curr);
+            curr->value = tmp->value;
+            curr->right = erase(curr->right, tmp->value);
           }
           else {
-            tmp = lastPredecessor(root);
-            root->value = tmp->value;
-            root->left = erase(root->left, tmp->value);
+            tmp = lastPredecessor(curr);
+            curr->value = tmp->value;
+            curr->left = erase(curr->left, tmp->value);
           }
         }
       }
 
-      return root;
+      int bf = getBalanceFactor(curr);
+
+      if(bf >= 2 && getBalanceFactor(curr->left) >= 0) { // left left
+        return rightRotate(curr);
+      }
+      else if(bf >= 2 && getBalanceFactor(curr->left) == -1) { // left right
+        curr->left = leftRotate(curr->left);
+        return rightRotate(curr);
+      }
+      else if(bf <= -2 && getBalanceFactor(curr->right) <= 0) { // right right
+        return leftRotate(curr);
+      }
+      else if(bf <= -2 && getBalanceFactor(curr->right) == 1) { // right left
+        curr->right = rightRotate(curr->right);
+        return leftRotate(curr);
+      }
+      return curr;
     }
 
 };
+
+/*
+  
+ 7  
+2  15
+  
+bf=2
+bf-left = 1
+
+x=15
+y=7
+sub=null
+TreeNode* rightRotate(TreeNode *x) {
+      TreeNode *y = x->left;
+      TreeNode *subtree = y->right;
+      // perform rotation
+      y->right = x;
+      x->left = subtree;
+      return y;
+    }
+*/

@@ -150,7 +150,7 @@ class BST:
         root = None
         return tmp
       else: # 2 children
-        # replace w/ next sucessor or last pre
+        # replace w/ next sucessor or last predecessor
         if self.nextSucessor(root) != None:
           tmp = self.nextSucessor(root)
           root.value = tmp.value
