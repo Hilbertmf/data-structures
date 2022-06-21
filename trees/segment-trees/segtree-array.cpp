@@ -24,9 +24,9 @@ struct segtree {
                 update(pos, val, left, mid, 2*node + 1);
             else
                 update(pos, val, mid + 1, right, 2*node + 2);
+            // update ancestrals
+            sums[node] = sums[2*node + 1] + sums[2*node + 2];
         }
-        // update ancestrals
-        sums[node] = sums[2*node + 1] + sums[2*node + 2];
     }
 
     int querySum(int queryLeft, int queryRight) {
